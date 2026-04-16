@@ -1,0 +1,17 @@
+{
+  "prices": {
+    "mavic3Pro": "97",
+    "mavic4Pro": "137"
+  },
+  "utmfyHeadScript": "",
+  "linkPresets": [
+    {
+      "id": "preset-default",
+      "name": "Par principal",
+      "mavic3ProUrl": "",
+      "mavic4ProUrl": "",
+      "isActive": true
+    }
+  ],
+  "updatedAt": "2026-04-16T00:00:00.000Z"
+}
