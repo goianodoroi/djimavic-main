@@ -26,7 +26,7 @@ export default async function RootLayout({
   const headScripts = extractHeadScriptBlocks(config.utmfyHeadScript);
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         {headScripts.map((scriptContent, index) => (
           <Script

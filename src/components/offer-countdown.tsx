@@ -16,7 +16,17 @@ function formatTime(totalSeconds: number) {
   };
 }
 
-export function OfferCountdown() {
+export function OfferCountdown({
+  label = "Limited Time Offer",
+  hourLabel = "H",
+  minuteLabel = "M",
+  secondLabel = "S",
+}: {
+  label?: string;
+  hourLabel?: string;
+  minuteLabel?: string;
+  secondLabel?: string;
+}) {
   const [timeLeft, setTimeLeft] = useState(INITIAL_TIME);
 
   useEffect(() => {
@@ -34,21 +44,27 @@ export function OfferCountdown() {
       <div className="mx-auto flex max-w-fit items-center justify-center rounded-full border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.06))] px-3 py-2 text-white/88 backdrop-blur-xl sm:px-6 sm:py-2">
         <div className="flex items-center justify-center gap-1 whitespace-nowrap text-center sm:gap-2.5">
           <span className="text-[9px] font-medium uppercase tracking-[0.32em] text-white/70 sm:text-[9px]">
-            Limited Time Offer
+            {label}
           </span>
           <span className="h-3.5 w-px bg-white/10 sm:h-4" />
           <div className="flex items-baseline gap-2 text-[1.05rem] font-medium tracking-[-0.04em] text-white sm:gap-2.5 sm:text-[1.2rem]">
             <span className="inline-flex items-baseline gap-[1px]">
               <span>{hours}</span>
-              <span className="text-[0.5em] font-normal text-white/52">H</span>
+              <span className="text-[0.5em] font-normal text-white/52">
+                {hourLabel}
+              </span>
             </span>
             <span className="inline-flex items-baseline gap-[1px]">
               <span>{minutes}</span>
-              <span className="text-[0.5em] font-normal text-white/52">M</span>
+              <span className="text-[0.5em] font-normal text-white/52">
+                {minuteLabel}
+              </span>
             </span>
             <span className="inline-flex items-baseline gap-[1px]">
               <span>{seconds}</span>
-              <span className="text-[0.5em] font-normal text-white/52">S</span>
+              <span className="text-[0.5em] font-normal text-white/52">
+                {secondLabel}
+              </span>
             </span>
           </div>
         </div>

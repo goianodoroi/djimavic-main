@@ -1,5 +1,11 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { buildLocalizationContext } from "@/lib/localization/server";
+import type {
+  LocalizedPrice,
+  LocalizationContext,
+  SearchParamsInput,
+} from "@/lib/localization/types";
 
 export type ProductKey = "mavic3Pro" | "mavic4Pro";
 
@@ -19,11 +25,19 @@ export type SiteConfig = {
 };
 
 export type PublicSiteConfig = {
-  prices: Record<ProductKey, string>;
-  cheapestPrice: string;
+  prices: Record<ProductKey, LocalizedPrice>;
+  cheapestPrice: LocalizedPrice;
   checkoutUrls: Record<ProductKey, string>;
   activePresetId: string;
   activePresetName: string;
+  localization: LocalizationContext;
+};
+
+type PublicSiteConfigInput = {
+  headers?: {
+    get(name: string): string | null;
+  };
+  searchParams?: SearchParamsInput;
 };
 
 const CONFIG_DIR = path.join(process.cwd(), "data");
@@ -75,20 +89,6 @@ function parsePrice(value: string) {
   }
 
   return parsed;
-}
-
-function formatPrice(value: string) {
-  const parsed = parsePrice(value);
-
-  if (!parsed) {
-    return "$0";
-  }
-
-  const hasDecimals = !Number.isInteger(parsed);
-  return `$${parsed.toLocaleString("en-US", {
-    minimumFractionDigits: hasDecimals ? 2 : 0,
-    maximumFractionDigits: 2,
-  })}`;
 }
 
 function normalizeLinkPreset(value: unknown, index: number): LinkPreset {
@@ -183,28 +183,34 @@ export async function saveSiteConfig(input: SiteConfig) {
   return config;
 }
 
-export async function getPublicSiteConfig(): Promise<PublicSiteConfig> {
+export async function getPublicSiteConfig(
+  input: PublicSiteConfigInput = {},
+): Promise<PublicSiteConfig> {
   const config = await loadSiteConfig();
   const activePreset =
     config.linkPresets.find((preset) => preset.isActive) ?? config.linkPresets[0];
-  const cheapestNumericPrice = Math.min(
-    parsePrice(config.prices.mavic3Pro),
-    parsePrice(config.prices.mavic4Pro),
-  );
-  const cheapestPrice = formatPrice(String(cheapestNumericPrice));
+  const basePrices = {
+    mavic3Pro: parsePrice(config.prices.mavic3Pro),
+    mavic4Pro: parsePrice(config.prices.mavic4Pro),
+  };
+  const cheapestKey =
+    basePrices.mavic3Pro <= basePrices.mavic4Pro ? "mavic3Pro" : "mavic4Pro";
+  const localization = await buildLocalizationContext({
+    basePrices,
+    headers: input.headers,
+    searchParams: input.searchParams,
+  });
 
   return {
-    prices: {
-      mavic3Pro: formatPrice(config.prices.mavic3Pro),
-      mavic4Pro: formatPrice(config.prices.mavic4Pro),
-    },
-    cheapestPrice,
+    prices: localization.prices as Record<ProductKey, LocalizedPrice>,
+    cheapestPrice: localization.prices[cheapestKey],
     checkoutUrls: {
       mavic3Pro: activePreset?.mavic3ProUrl ?? "",
       mavic4Pro: activePreset?.mavic4ProUrl ?? "",
     },
     activePresetId: activePreset?.id ?? "",
     activePresetName: activePreset?.name ?? "",
+    localization,
   };
 }
 

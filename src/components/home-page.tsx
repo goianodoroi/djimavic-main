@@ -49,73 +49,73 @@ const heroSlides = [
 const kitItems = [
   {
     icon: ToyBrick,
-    title: "DJI Mavic Drone (3 Pro or 4 Pro)",
+    titleKey: "kitItemDrone",
   },
   {
     icon: Gamepad2,
-    title: "Smart remote controller",
+    titleKey: "kitItemController",
   },
   {
     icon: BatteryCharging,
-    title: "1 long-lasting battery",
+    titleKey: "kitItemBattery",
   },
   {
     icon: Disc3,
-    title: "Extra propellers and guards",
+    titleKey: "kitItemPropellers",
   },
   {
     icon: Cable,
-    title: "Charging cables",
+    titleKey: "kitItemCables",
   },
   {
     icon: BriefcaseBusiness,
-    title: "Premium bag + integrated gimbal",
+    titleKey: "kitItemBag",
   },
 ] as const;
 
 const modelKitTopics = [
   {
     icon: Gamepad2,
-    label: "Controller",
+    labelKey: "topicController",
   },
   {
     icon: BriefcaseBusiness,
-    label: "Bag",
+    labelKey: "topicBag",
   },
   {
     icon: Disc3,
-    label: "Propellers",
+    labelKey: "topicPropellers",
   },
   {
     icon: ShieldCheck,
-    label: "Guards",
+    labelKey: "topicGuards",
   },
   {
     icon: Cable,
-    label: "Cables",
+    labelKey: "topicCables",
   },
   {
     icon: BatteryCharging,
-    label: "Battery",
+    labelKey: "topicBattery",
   },
 ] as const;
 
 const faqItems = [
   {
-    q: "How long does delivery take?",
-    a: "Shipping is free and the average delivery time is 7 to 15 business days, depending on your location.",
+    qKey: "faqShippingQ",
+    aKey: "faqShippingA",
   },
   {
-    q: "Why is the price so low?",
-    a: "With the launch of DJI's new global lineup, current-generation inventory is being cleared out. We use direct distributor agreements to offer prices below market value.",
+    qKey: "faqPriceQ",
+    aKey: "faqPriceA",
   },
   {
-    q: "Can I return it if I do not like it?",
-    a: "Yes. You have 30 days to return the product at no cost and receive a full refund, no questions asked.",
+    qKey: "faqReturnQ",
+    aKey: "faqReturnA",
   },
   {
-    q: "What is the difference between the Mavic 3 Pro and 4 Pro?",
-    a: "The Mavic 4 Pro has a flight range of up to 41 km (vs. 28 km), charges 3 batteries in 90 min (vs. 210 min), and includes an upgraded image sensor with higher resolution.",
+    qKey: "faqDifferenceQ",
+    aKey: "faqDifferenceA",
   },
 ] as const;
 
@@ -127,9 +127,16 @@ export function HomePage({
   prices,
   cheapestPrice,
   checkoutUrls,
+  localization,
 }: PublicSiteConfig) {
   const [activeSlide, setActiveSlide] = useState(0);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const copy = localization.copy;
+
+  useEffect(() => {
+    document.documentElement.lang = localization.locale;
+    document.documentElement.dir = localization.isRtl ? "rtl" : "ltr";
+  }, [localization.isRtl, localization.locale]);
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -177,8 +184,13 @@ export function HomePage({
   }, []);
 
   return (
-    <main className="bg-black text-[var(--foreground)]">
-      <OfferCountdown />
+    <main className="bg-black text-[var(--foreground)]" dir={localization.isRtl ? "rtl" : "ltr"}>
+      <OfferCountdown
+        label={copy.countdownLabel}
+        hourLabel={copy.countdownHourShort}
+        minuteLabel={copy.countdownMinuteShort}
+        secondLabel={copy.countdownSecondShort}
+      />
       <section className="relative isolate overflow-hidden bg-black">
         {heroSlides.map((slide, index) => {
           const isActive = index === activeSlide;
@@ -227,16 +239,18 @@ export function HomePage({
 
         <div className="relative mx-auto flex min-h-[100dvh] max-w-[1440px] flex-col justify-between px-6 pb-5 pt-24 text-center sm:px-8 sm:pb-10 sm:pt-24 lg:px-14 lg:pb-12 lg:pt-22">
           <div className="mx-auto flex max-w-[880px] flex-col items-center space-y-5">
-            <HeroModelLabel activeIndex={activeSlide} />
+            <HeroModelLabel
+              activeIndex={activeSlide}
+              models={[copy.heroModelMavic4, copy.heroModelMavic3]}
+            />
 
             <div className="space-y-5">
               <h1 className="mx-auto max-w-[18ch] text-[clamp(2.35rem,5vw,4.75rem)] font-medium leading-[0.94] tracking-[-0.05em] text-white">
-                Complete DJI Drone Kit at a ridiculous price.
+                {copy.heroTitle}
               </h1>
 
               <p className="mx-auto max-w-[38ch] text-sm leading-6 text-white/72 sm:text-[15px] sm:leading-7">
-                With the launch of the new global lineup, older inventory is now
-                being released.
+                {copy.heroSubtitle}
               </p>
             </div>
           </div>
@@ -245,14 +259,14 @@ export function HomePage({
 
           <div className="mx-auto flex max-w-[860px] flex-col items-center gap-5 pb-[60px] text-center md:pb-0">
             <div className="text-[11px] font-medium uppercase tracking-[0.08em] text-white/64">
-              BAG, PROPELLERS, GUARDS, CABLES AND BATTERY.
+              {copy.heroFeatureLine}
             </div>
 
             <a
               href="#choose-model"
               className="inline-flex min-h-14 items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--dji-orange-soft)_0%,var(--dji-orange)_100%)] px-8 text-[13px] font-semibold text-black transition duration-300 ease-out hover:-translate-y-0.5 active:translate-y-px"
             >
-              {`GET MY DRONE ${cheapestPrice}`}
+              {`${copy.ctaGetMyDrone} ${cheapestPrice.formatted}`}
             </a>
 
             <div className="flex items-center justify-center gap-2 pt-1">
@@ -263,7 +277,7 @@ export function HomePage({
                   <button
                     key={slide.id}
                     type="button"
-                    aria-label={`Go to image ${index + 1}`}
+                    aria-label={`${copy.carouselGoToImage} ${index + 1}`}
                     aria-pressed={isActive}
                     onClick={() => setActiveSlide(index)}
                     className={`h-2.5 rounded-full transition-all duration-500 ease-out ${
@@ -284,7 +298,7 @@ export function HomePage({
           <div className="relative z-0 origin-top scale-[1.14] overflow-visible rounded-[28px] lg:origin-left lg:scale-[1.15]">
             <Image
               src={sectionImage}
-              alt="DJI Mavic kit items"
+              alt={copy.kitImageAlt}
               className="h-auto w-full object-contain"
               unoptimized
               quality={100}
@@ -309,7 +323,7 @@ export function HomePage({
                 data-reveal="text"
                 className="bg-[linear-gradient(135deg,var(--dji-orange-soft)_0%,var(--dji-orange)_100%)] bg-clip-text text-[clamp(2rem,3.6vw,3.5rem)] font-medium leading-[0.96] tracking-[-0.045em] text-transparent"
               >
-                What Comes in the Kit
+                {copy.kitTitle}
               </h2>
 
               <p
@@ -317,8 +331,7 @@ export function HomePage({
                 className="mx-auto max-w-[48ch] text-base leading-7 text-white/72 sm:text-[17px] lg:mx-0"
                 style={{ transitionDelay: "90ms" }}
               >
-                You receive a complete bundle designed to come out of the box and
-                fly with ease from the very first use.
+                {copy.kitBody}
               </p>
 
               <div className="space-y-3">
@@ -327,7 +340,7 @@ export function HomePage({
 
                   return (
                     <div
-                      key={item.title}
+                      key={item.titleKey}
                       data-reveal="card"
                       className="flex items-center gap-4 rounded-[22px] border border-white/6 bg-white/[0.025] px-4 py-3 backdrop-blur-[2px]"
                       style={{ transitionDelay: `${140 + index * 65}ms` }}
@@ -338,7 +351,7 @@ export function HomePage({
 
                       <div>
                         <h3 className="m-0 text-[15px] font-medium leading-[1.2] text-white sm:text-base">
-                          {item.title}
+                          {copy[item.titleKey]}
                         </h3>
                       </div>
                     </div>
@@ -352,7 +365,7 @@ export function HomePage({
                 className="inline-flex min-h-14 items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--dji-orange-soft)_0%,var(--dji-orange)_100%)] px-8 text-[13px] font-semibold text-black transition duration-300 ease-out hover:-translate-y-0.5 active:translate-y-px"
                 style={{ transitionDelay: "560ms" }}
               >
-                {`GET MY DRONE ${cheapestPrice}`}
+                {`${copy.ctaGetMyDrone} ${cheapestPrice.formatted}`}
               </a>
             </div>
           </div>
@@ -371,12 +384,12 @@ export function HomePage({
           >
             <h2 className="text-[clamp(2rem,4.2vw,3.8rem)] font-medium leading-[0.95] tracking-[-0.045em] text-white">
               <span className="bg-[linear-gradient(135deg,var(--dji-orange-soft)_0%,var(--dji-orange)_100%)] bg-clip-text text-transparent">
-                Comparison
+                {copy.comparisonHeadingLead}
               </span>{" "}
-              between the DJI Mavic 4 Pro and 3 Pro
+              {copy.comparisonHeadingRest}
             </h2>
             <p className="mx-auto mt-4 max-w-[480px] text-base leading-relaxed text-white/56 sm:text-lg">
-              The new-generation leap in range and charging.
+              {copy.comparisonSubtitle}
             </p>
           </div>
 
@@ -387,14 +400,14 @@ export function HomePage({
               style={{ transitionDelay: "90ms" }}
             >
               <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-white/38">
-                Flight Range
+                {copy.metricFlightRange}
               </p>
 
               <div className="mt-7 space-y-1.5">
                 <div className="flex items-baseline justify-between">
-                  <span className="text-sm text-white/56">Mavic 4 Pro</span>
+                  <span className="text-sm text-white/56">{copy.modelMavic4}</span>
                   <span className="text-[1.5rem] font-medium leading-none tracking-[-0.03em] text-[#ff9c43]">
-                    up to 41km
+                    {copy.upTo41Km}
                   </span>
                 </div>
                 <div className="h-[6px] overflow-hidden rounded-full bg-white/[0.06]">
@@ -407,9 +420,9 @@ export function HomePage({
 
               <div className="mt-6 space-y-1.5">
                 <div className="flex items-baseline justify-between">
-                  <span className="text-sm text-white/56">Mavic 3 Pro</span>
+                  <span className="text-sm text-white/56">{copy.modelMavic3}</span>
                   <span className="text-[1.25rem] font-medium leading-none tracking-[-0.03em] text-white/80">
-                    up to 28km
+                    {copy.upTo28Km}
                   </span>
                 </div>
                 <div className="h-[6px] overflow-hidden rounded-full bg-white/[0.06]">
@@ -427,14 +440,14 @@ export function HomePage({
               style={{ transitionDelay: "170ms" }}
             >
               <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-white/38">
-                Charging Time (3 Batteries)
+                {copy.metricChargingThree}
               </p>
 
               <div className="mt-7 space-y-1.5">
                 <div className="flex items-baseline justify-between">
-                  <span className="text-sm text-white/56">Mavic 4 Pro</span>
+                  <span className="text-sm text-white/56">{copy.modelMavic4}</span>
                   <span className="text-[1.5rem] font-medium leading-none tracking-[-0.03em] text-[#ff9c43]">
-                    90 min
+                    {copy.minutes90}
                   </span>
                 </div>
                 <div className="h-[6px] overflow-hidden rounded-full bg-white/[0.06]">
@@ -447,9 +460,9 @@ export function HomePage({
 
               <div className="mt-6 space-y-1.5">
                 <div className="flex items-baseline justify-between">
-                  <span className="text-sm text-white/56">Mavic 3 Pro</span>
+                  <span className="text-sm text-white/56">{copy.modelMavic3}</span>
                   <span className="text-[1.25rem] font-medium leading-none tracking-[-0.03em] text-white/80">
-                    210 min
+                    {copy.minutes210}
                   </span>
                 </div>
                 <div className="h-[6px] overflow-hidden rounded-full bg-white/[0.06]">
@@ -467,14 +480,14 @@ export function HomePage({
               style={{ transitionDelay: "250ms" }}
             >
               <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-white/38">
-                Charging (1 Battery)
+                {copy.metricChargingOne}
               </p>
 
               <div className="mt-7 space-y-1.5">
                 <div className="flex items-baseline justify-between">
-                  <span className="text-sm text-white/56">Mavic 4 Pro</span>
+                  <span className="text-sm text-white/56">{copy.modelMavic4}</span>
                   <span className="text-[1.5rem] font-medium leading-none tracking-[-0.03em] text-[#ff9c43]">
-                    51 min
+                    {copy.minutes51}
                   </span>
                 </div>
                 <div className="h-[6px] overflow-hidden rounded-full bg-white/[0.06]">
@@ -487,9 +500,9 @@ export function HomePage({
 
               <div className="mt-6 space-y-1.5">
                 <div className="flex items-baseline justify-between">
-                  <span className="text-sm text-white/56">Mavic 3 Pro</span>
+                  <span className="text-sm text-white/56">{copy.modelMavic3}</span>
                   <span className="text-[1.25rem] font-medium leading-none tracking-[-0.03em] text-white/80">
-                    70 min
+                    {copy.minutes70}
                   </span>
                 </div>
                 <div className="h-[6px] overflow-hidden rounded-full bg-white/[0.06]">
@@ -508,10 +521,10 @@ export function HomePage({
         <div className="mx-auto max-w-[1440px] px-6 sm:px-8 lg:px-14">
           <div className="mx-auto max-w-[600px] text-center">
             <h2 className="text-[clamp(2rem,4.2vw,3.8rem)] font-medium leading-[0.95] tracking-[-0.045em] text-white">
-              Choose Your Model
+              {copy.chooseModelTitle}
             </h2>
             <p className="mx-auto mt-4 max-w-[420px] text-base leading-relaxed text-white/50 sm:text-lg">
-              Complete kit ready to fly. Free shipping.
+              {copy.chooseModelSubtitle}
             </p>
           </div>
 
@@ -530,7 +543,7 @@ export function HomePage({
               <div className="flex flex-1 flex-col space-y-5 p-6 sm:p-8">
                 <div>
                   <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-white/36">
-                    Kit Fly More
+                    {copy.productBadge}
                   </p>
                   <h3 className="mt-1 text-xl font-medium tracking-[-0.02em] text-white">
                     DJI Mavic 4 Pro
@@ -539,7 +552,7 @@ export function HomePage({
 
                 <div>
                   <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-white/34">
-                    Complete Kit
+                    {copy.completeKit}
                   </p>
                   <div className="mt-3 space-y-2.5">
                     {modelKitTopics.map((topic) => {
@@ -547,13 +560,15 @@ export function HomePage({
 
                       return (
                         <div
-                          key={topic.label}
+                          key={topic.labelKey}
                           className="flex items-center gap-2.5"
                         >
                           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-white/[0.045] text-[#e05d26]/80">
                             <Icon size={16} strokeWidth={1.7} />
                           </span>
-                          <span className="text-[13px] text-white/52">{topic.label}</span>
+                          <span className="text-[13px] text-white/52">
+                            {copy[topic.labelKey]}
+                          </span>
                         </div>
                       );
                     })}
@@ -565,13 +580,13 @@ export function HomePage({
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-white/[0.045] text-[#e05d26]/80">
                       <Truck size={16} strokeWidth={1.7} />
                     </span>
-                    <span className="text-[13px] text-white/52">Free Shipping</span>
+                    <span className="text-[13px] text-white/52">{copy.freeShipping}</span>
                   </div>
                   <div className="flex items-center gap-2.5">
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-white/[0.045] text-[#e05d26]/80">
                       <Package size={16} strokeWidth={1.7} />
                     </span>
-                    <span className="text-[13px] text-white/52">Limited Stock</span>
+                    <span className="text-[13px] text-white/52">{copy.limitedStock}</span>
                   </div>
                 </div>
 
@@ -579,7 +594,7 @@ export function HomePage({
 
                 <div className="flex items-end gap-2">
                   <span className="text-3xl font-semibold tracking-[-0.03em] text-white">
-                    {prices.mavic4Pro}
+                    {prices.mavic4Pro.formatted}
                   </span>
                 </div>
 
@@ -587,7 +602,7 @@ export function HomePage({
                   href={resolveCheckoutHref(checkoutUrls.mavic4Pro)}
                   className="flex min-h-[52px] w-full items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--dji-orange-soft)_0%,var(--dji-orange)_100%)] text-[13px] font-semibold text-black transition duration-300 ease-out hover:-translate-y-0.5 active:translate-y-px"
                 >
-                  GET MY DRONE
+                  {copy.ctaGetMyDrone}
                 </a>
               </div>
             </div>
@@ -606,7 +621,7 @@ export function HomePage({
               <div className="flex flex-1 flex-col space-y-5 p-6 sm:p-8">
                 <div>
                   <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-white/36">
-                    Kit Fly More
+                    {copy.productBadge}
                   </p>
                   <h3 className="mt-1 text-xl font-medium tracking-[-0.02em] text-white">
                     DJI Mavic 3 Pro
@@ -615,7 +630,7 @@ export function HomePage({
 
                 <div>
                   <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-white/34">
-                    Complete Kit
+                    {copy.completeKit}
                   </p>
                   <div className="mt-3 space-y-2.5">
                     {modelKitTopics.map((topic) => {
@@ -623,13 +638,15 @@ export function HomePage({
 
                       return (
                         <div
-                          key={topic.label}
+                          key={topic.labelKey}
                           className="flex items-center gap-2.5"
                         >
                           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-white/[0.045] text-white/82">
                             <Icon size={16} strokeWidth={1.7} />
                           </span>
-                          <span className="text-[13px] text-white/52">{topic.label}</span>
+                          <span className="text-[13px] text-white/52">
+                            {copy[topic.labelKey]}
+                          </span>
                         </div>
                       );
                     })}
@@ -641,13 +658,13 @@ export function HomePage({
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-white/[0.045] text-white/82">
                       <Truck size={16} strokeWidth={1.7} />
                     </span>
-                    <span className="text-[13px] text-white/52">Free Shipping</span>
+                    <span className="text-[13px] text-white/52">{copy.freeShipping}</span>
                   </div>
                   <div className="flex items-center gap-2.5">
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-white/[0.045] text-white/82">
                       <Package size={16} strokeWidth={1.7} />
                     </span>
-                    <span className="text-[13px] text-white/52">Limited Stock</span>
+                    <span className="text-[13px] text-white/52">{copy.limitedStock}</span>
                   </div>
                 </div>
 
@@ -655,7 +672,7 @@ export function HomePage({
 
                 <div className="flex items-end gap-2">
                   <span className="text-3xl font-semibold tracking-[-0.03em] text-white">
-                    {prices.mavic3Pro}
+                    {prices.mavic3Pro.formatted}
                   </span>
                 </div>
 
@@ -663,7 +680,7 @@ export function HomePage({
                   href={resolveCheckoutHref(checkoutUrls.mavic3Pro)}
                   className="flex min-h-[52px] w-full items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--dji-orange-soft)_0%,var(--dji-orange)_100%)] text-[13px] font-semibold text-black transition duration-300 ease-out hover:-translate-y-0.5 active:translate-y-px"
                 >
-                  GET MY DRONE
+                  {copy.ctaGetMyDrone}
                 </a>
               </div>
             </div>
@@ -676,7 +693,7 @@ export function HomePage({
 
         <div className="mx-auto max-w-[740px] px-6 pt-20 sm:px-8 md:pt-32">
           <h2 className="text-center text-[clamp(1.8rem,3.6vw,3rem)] font-medium leading-[0.96] tracking-[-0.04em] text-white">
-            Frequently Asked Questions
+            {copy.faqTitle}
           </h2>
 
           <div className="mt-12 divide-y divide-white/[0.06]">
@@ -684,14 +701,14 @@ export function HomePage({
               const isOpen = openFaq === i;
 
               return (
-                <div key={item.q}>
+                <div key={item.qKey}>
                   <button
                     type="button"
                     onClick={() => setOpenFaq(isOpen ? null : i)}
                     className="flex w-full items-center justify-between gap-4 py-5 text-left"
                   >
                     <span className="text-[15px] font-medium leading-snug text-white/88 sm:text-base">
-                      {item.q}
+                      {copy[item.qKey]}
                     </span>
                     <ChevronDown
                       size={18}
@@ -708,7 +725,7 @@ export function HomePage({
                   >
                     <div className="overflow-hidden">
                       <p className="pb-5 text-sm leading-relaxed text-white/48">
-                        {item.a}
+                        {copy[item.aKey]}
                       </p>
                     </div>
                   </div>
@@ -730,18 +747,18 @@ export function HomePage({
                 className="h-5 w-auto opacity-40"
               />
               <span className="text-sm text-white/28">|</span>
-              <span className="text-sm text-white/40">Mavic Pro Series</span>
+              <span className="text-sm text-white/40">{copy.footerSeries}</span>
             </div>
 
             <div className="flex items-center gap-6 text-[13px] text-white/32">
-              <a href="#" className="transition-colors hover:text-white/56">Privacy</a>
-              <a href="#" className="transition-colors hover:text-white/56">Terms</a>
-              <a href="#" className="transition-colors hover:text-white/56">Contact</a>
+              <a href="#" className="transition-colors hover:text-white/56">{copy.privacy}</a>
+              <a href="#" className="transition-colors hover:text-white/56">{copy.terms}</a>
+              <a href="#" className="transition-colors hover:text-white/56">{copy.contact}</a>
             </div>
           </div>
 
           <p className="mt-6 text-center text-[11px] leading-relaxed text-white/18 md:text-left">
-            This site is not affiliated with or endorsed by DJI. Product names and images are used for identification purposes only.
+            {copy.disclaimer}
           </p>
         </div>
       </footer>

@@ -1,17 +1,23 @@
 "use client";
 
-const MODELS = [
+const DEFAULT_MODELS = [
   "KIT DJI MAVIC 4 PRO FLY",
   "KIT DJI MAVIC 3 PRO FLY",
 ] as const;
 
-export function HeroModelLabel({ activeIndex = 0 }: { activeIndex?: number }) {
+export function HeroModelLabel({
+  activeIndex = 0,
+  models = DEFAULT_MODELS,
+}: {
+  activeIndex?: number;
+  models?: readonly string[];
+}) {
   return (
     <div
-      aria-label={MODELS[activeIndex]}
+      aria-label={models[activeIndex]}
       className="relative h-[1.4em] w-full max-w-[30ch] overflow-visible px-4"
     >
-      {MODELS.map((model, index) => {
+      {models.map((model, index) => {
         const isActive = index === activeIndex;
 
         return (
